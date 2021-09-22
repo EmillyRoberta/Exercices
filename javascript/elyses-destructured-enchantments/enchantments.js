@@ -9,9 +9,12 @@
  * @returns {Card} the first card in the deck
  */
 export function getFirstCard(deck) {
-    var removida;
+  const [a, b, ...spread] = deck;
+  return a;
+
+   /* var removida;
     removida = deck.shift();
-    return removida;
+    return removida;*/
   
 }
 
@@ -35,15 +38,16 @@ export function getSecondCard(deck) {
  * @returns {Card[]} new deck with reordered cards
  */
 export function swapTopTwoCards(deck) {
-  var novoArray, cartaRemovida;
-
+ /* var novoArray, cartaRemovida;
   novoArray = deck;
-
   cartaRemovida = novoArray.shift(); //remove a primeira carta do array
-
   novoArray.splice(1,0,cartaRemovida); //insere a carta removida na posicão 1(a segunda posição)
+  return novoArray; */
 
-  return novoArray; 
+  const [firstCard, secondCard, ...rest] = deck;
+  deck = [secondCard, firstCard, ...rest];
+  return deck;
+
 }
 
 /**
