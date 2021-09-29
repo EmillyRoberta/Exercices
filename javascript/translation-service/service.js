@@ -1,5 +1,6 @@
 /// <reference path="./global.d.ts" />
 
+import { NotAvailable } from "./errors";
 
 
 // @ts-check
@@ -95,34 +96,29 @@ export class TranslationService {
    * @param {string} text
    * @returns {Promise<void>}
    */
-  request(text) {
-    return new Promise((resolve, reject) => {
-      let ultimoErro;
-      this.api.request(text, error => {
-        if(error == null)
-          resolve(undefined);
-        else{
-         // ultimoErro = error;
-         this.api.request(text, error2 =>{
-           if(error2 == null)
-           resolve(undefined);
-
-           else{
-             this.api.request(text, error3 => {
-               if(error3 == null)
-               resolve(undefined);
-
-               else{
-                 reject(error3);
-               }
-             })
-           }
-         })
+async request(text) {
+    for (let index = 1; index <= 3; index++) {
+      try {
+        await this.requestPromise(text);
+        return undefined; 
+      } catch (error) {
+        if (index === 3) {
+          throw error; 
         }
-    
-      })
-});
+      }
+      
+    }
   }
+
+requestPromise (text) {
+    return new Promise ((resolve, reject) => {
+      this.api.request(text, error => {
+        if (error == null){
+          resolve(undefined);
+        } else reject (error); 
+      });
+    });
+}
 
   /**
    * Retrieves the translation for the given text
@@ -134,9 +130,25 @@ export class TranslationService {
    * @param {number} minimumQuality
    * @returns {Promise<string>}
    */
-  premium(text, minimumQuality) {
-    throw new Error('Implement the premium function');
+  async premium(text, minimumQuality) {
+  try{
+   var result = await this.api.fetch(text);
+   if(result.quality >= minimumQuality) return result.translation;
+   else{
+     throw new QualityThresholdNotMet();
+   }
+   
+  }catch(error){
+      if(error instanceof NotAvailable){
+        await this.request(text);
+        return (await this.api.fetch(text)).translation;
+      }else {
+        throw error;
+      }
   }
+
+  }
+
 }
 
 /**
