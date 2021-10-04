@@ -12,7 +12,6 @@ export function toRna(dna: string): string  {
   }
   return result;
 }
- 
 enum dnaBasis {
   G = 'C',
   C = 'G',
